@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.microservicios.product.entities.Product;
-import com.microservicios.product.service.ProductService;
+import com.microservicios.product.dto.ProductDto;
+import com.microservicios.product.service.IProductService;
 
 @RestController
 @RequestMapping(value = "/api/products")
-public class ProductController {
+public class ProductRestController {
 	@Autowired
-	private ProductService productService;
+	private IProductService productService;
 
 	@GetMapping
-	public ResponseEntity<List<Product>> listProduct() {
-		List<Product> listProduct = productService.listAllProduct();
+	public ResponseEntity<List<ProductDto>> listProduct() {
+		List<ProductDto> listProduct = productService.listAllProduct();
 		if (listProduct.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
@@ -29,8 +29,8 @@ public class ProductController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-		return ResponseEntity.ok(productService.createProduct(product));
+	public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+		return ResponseEntity.ok(productService.createProduct(productDto));
 
 	}
 
