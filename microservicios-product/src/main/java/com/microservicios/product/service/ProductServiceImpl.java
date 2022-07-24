@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.microservicios.product.dto.CategoryDto;
@@ -22,6 +26,7 @@ public class ProductServiceImpl implements IProductService {
 	@Autowired
 	private IProductRepository productRepository;
 	@Autowired
+	@Qualifier("modelMapperProduct")
 	private ModelMapper modelMapper;
 
 	@Override
@@ -30,6 +35,14 @@ public class ProductServiceImpl implements IProductService {
 		List<Product> listProducts = productRepository.findAll();
 		return listProducts.stream().map(product -> modelMapper.map(product, ProductDto.class))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public Page<ProductDto> pageProduct(Pageable pageable) {
+		Page<Product> pageProduct = productRepository.findAll(pageable);
+		List<ProductDto> listProductDto = pageProduct.stream()
+				.map(product -> modelMapper.map(product, ProductDto.class)).collect(Collectors.toList());
+		return new PageImpl<>(listProductDto);
 	}
 
 	@Override
@@ -99,7 +112,7 @@ public class ProductServiceImpl implements IProductService {
 	}
 
 	private String getMessage(Long id) {
-		return "Category by id " + id + " was not found.";
+		return "Product by id " + id + " was not found.";
 	}
 
 }

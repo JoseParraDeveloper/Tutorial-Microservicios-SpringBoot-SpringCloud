@@ -11,14 +11,14 @@ public class ProductDto {
 	private BigDecimal price;
 	private Boolean enabled;
 	private Date createAt;
-	private CategoryDto category;
+	private CategoryDto categoryDto;
 
 	public ProductDto() {
 		super();
 	}
 
 	public ProductDto(Long id, String name, String description, Integer stock, BigDecimal price, Boolean enabled,
-			Date createAt, CategoryDto category) {
+			Date createAt, CategoryDto categoryDto) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -27,7 +27,7 @@ public class ProductDto {
 		this.price = price;
 		this.enabled = enabled;
 		this.createAt = createAt;
-		this.category = category;
+		this.categoryDto = categoryDto;
 	}
 
 	public Long getId() {
@@ -86,12 +86,12 @@ public class ProductDto {
 		this.createAt = createAt;
 	}
 
-	public CategoryDto getCategory() {
-		return category;
+	public CategoryDto getCategoryDto() {
+		return categoryDto;
 	}
 
-	public void setCategoryDto(CategoryDto category) {
-		this.category = category;
+	public void setCategoryDto(CategoryDto categoryDto) {
+		this.categoryDto = categoryDto;
 	}
 
 }

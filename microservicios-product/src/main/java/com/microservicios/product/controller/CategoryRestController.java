@@ -3,6 +3,9 @@ package com.microservicios.product.controller;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,17 +18,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.microservicios.product.dto.CategoryDto;
+import com.microservicios.product.exceptions.BadRequestException;
 import com.microservicios.product.exceptions.CategoryNotFoundException;
 import com.microservicios.product.service.ICategoryService;
 
 @RestController
-@RequestMapping(value = "/api/categories/")
+@RequestMapping(value = "/api/category")
 public class CategoryRestController {
 	@Autowired
 	private ICategoryService categoryService;
+	@Value("${sizePageCategory}")
+	private int sizePageCategory;
 
-	@GetMapping
-	public ResponseEntity<?> getCategories() {
+	@GetMapping(value = "/all")
+	public ResponseEntity<?> getAllCategories() {
 		Set<CategoryDto> listCategories = categoryService.listAllCategory();
 		if (listCategories.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("There are no categories.");
@@ -33,7 +39,16 @@ public class CategoryRestController {
 		return ResponseEntity.ok(listCategories);
 	}
 
-	@GetMapping(value = "{categoryID}")
+	@GetMapping(value = "/page/{page}")
+	public ResponseEntity<?> getCategoriesByPage(@PathVariable Integer page) {
+		Page<CategoryDto> pageCategories = categoryService.pageCategory(PageRequest.of(page - 1, sizePageCategory));
+		if (pageCategories.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("There are no categories in the page: " + page);
+		}
+		return ResponseEntity.ok(pageCategories);
+	}
+
+	@GetMapping(value = "/{categoryID}")
 	public ResponseEntity<?> getCategoryById(@PathVariable("categoryID") Long categoryId) {
 		try {
 			CategoryDto category = categoryService.findByIdCategory(categoryId);
@@ -43,7 +58,7 @@ public class CategoryRestController {
 		}
 	}
 
-	@PostMapping
+	@PostMapping(value = "/create")
 	public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
 		return ResponseEntity.ok(categoryService.createCategory(categoryDto));
 	}
@@ -66,8 +81,9 @@ public class CategoryRestController {
 			return new ResponseEntity<>(updateCategoryDto, HttpStatus.OK);
 		} catch (CategoryNotFoundException categoryNotFoundException) {
 			return new ResponseEntity<>(categoryNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (BadRequestException badRequestException) {
+			return new ResponseEntity<>(badRequestException.getMessage(), HttpStatus.BAD_REQUEST);
 		}
-
 	}
 
 }

@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.microservicios.product.dto.CategoryDto;
@@ -22,6 +26,7 @@ public class CategoryServiceImpl implements ICategoryService {
 	private ICategoryRepository categoryRepository;
 
 	@Autowired
+	@Qualifier("modelMapperCategory")
 	private ModelMapper modelMapper;
 
 	@Override
@@ -29,6 +34,14 @@ public class CategoryServiceImpl implements ICategoryService {
 		List<Category> listCategory = categoryRepository.findAll();
 		return listCategory.stream().map(category -> modelMapper.map(category, CategoryDto.class))
 				.collect(Collectors.toSet());
+	}
+
+	@Override
+	public Page<CategoryDto> pageCategory(Pageable pageable) {
+		Page<Category> pageCategory = categoryRepository.findAll(pageable);
+		List<CategoryDto> listCategoryDto = pageCategory.stream()
+				.map(category -> modelMapper.map(category, CategoryDto.class)).collect(Collectors.toList());
+		return new PageImpl<>(listCategoryDto);
 	}
 
 	@Override
