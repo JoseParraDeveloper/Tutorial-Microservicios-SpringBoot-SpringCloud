@@ -8,4 +8,4 @@
 6. API
 7. REST
 8. Pagination
-9. Swagger.SpringFox
+9. Swagger-SpringFox
